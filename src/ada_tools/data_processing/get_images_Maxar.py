@@ -5,6 +5,9 @@ import time
 import click
 import os
 from tqdm import tqdm
+import logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 def getFeatures(gdf):
@@ -51,22 +54,22 @@ def main(disaster, dest, maxpre, maxpost):
     # download images
     images_pre = [x for x in images if 'pre-' in x.split('/')[-4]]
     images_post = [x for x in images if 'post-' in x.split('/')[-4]]
-    print('total pre-disaster images:', len(images_pre))
-    print('total post-disaster images:', len(images_post))
-    print('selecting intersection of pre- and post-disaster sets (images that are in both)')
+    logger.info('total pre-disaster images:', len(images_pre))
+    logger.info('total post-disaster images:', len(images_post))
+    logger.info('selecting intersection of pre- and post-disaster sets (images that are in both)')
     images_pre_selected = [x for x in images_pre if x.split('/')[-1] in [x.split('/')[-1] for x in images_post]]
     images_post_selected = [x for x in images_post if x.split('/')[-1] in [x.split('/')[-1] for x in images_pre]]
     images_pre_selected = sorted(images_pre_selected, key=lambda x: x.split('/')[-1])
     images_post_selected = sorted(images_post_selected, key=lambda x: x.split('/')[-1])
-    print('selected pre-disaster images:', len(images_pre_selected))
-    print('selected post-disaster images:', len(images_post_selected))
-    print('downloading pre-disaster images')
+    logger.info('selected pre-disaster images:', len(images_pre_selected))
+    logger.info('selected post-disaster images:', len(images_post_selected))
+    logger.info('downloading pre-disaster images')
     for url in tqdm(images_pre_selected[:min(len(images_pre_selected), maxpre)]):
         name = url.split('/')[-1]
         cat = url.split('/')[-2]
         name = cat+'-'+name
         urllib.request.urlretrieve(url, dest+'/pre-event/'+name, reporthook)
-    print('downloading post-disaster images')
+    logger.info('downloading post-disaster images')
     for url in tqdm(images_post_selected[:min(len(images_post_selected), maxpost)]):
         name = url.split('/')[-1]
         cat = url.split('/')[-2]
